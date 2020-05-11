@@ -1,0 +1,55 @@
+mkdir SampleProject
+cd SampleProject/
+ls -la
+git init
+du -c
+touch coding.txt
+echo I love Coding > coding.txt
+cat coding.txt
+du -c
+git add coding.txt
+du -c
+ls .git/objects/e6/
+cat .git/objects/e6/90065515b5188b40a5c0df4a975849d1677aea
+printf "\x1f\x8b\x08\x00\x00\x00\x00\x00" |cat - .git/objects/e6/90065515b5188b40a5c0df4a975849d1677aea |gzip -dc
+git cat-file -p e690
+git cat-file -s e690
+git cat-file -t e690
+echo -e 'blob 14I love coding'|shasum
+echo -e 'blob 14\0I love coding'|shasum
+cd .git/objects/
+git cat-file -p e2adf495f2364725173e5d820faf3a45f87e855c
+git cat-file -p 26fed0d0f5f286ed9a8534e3ac32819510e4ef40
+cd ../..
+echo some code > coding.txt
+cat coding.txt
+git commit -am "Wrote some code"
+du -c
+git cat-file -p e5a9bbd9a4482495e80b4c22861261b9a8004350 
+git cat-file -p 8d20
+git cat-file -t 8d20
+git cat-file -s 8d20
+git cat-file -p e5a9
+git cat-file -s e5a9 
+git cat-file -t e5a9
+printf "\x1f\x8b\x08\x00\x00\x00\x00\x00" |cat - .git/objects/e5/a9bbd9a4482495e80b4c22861261b9a8004350 |gzip -dc
+cp ~/Desktop/Headshot.png .
+git add Headshot.png
+du -c
+git commit -am "Added Image"
+du -c
+vim Headshot.png
+git commit -am "minor change"
+git gc --aggressive
+du -c
+git verify-pack -v .git/objects/pack/pack-2d6261235fcabfee25186206342f67a6d9d8b42c.idx
+git cat-file -s 01b6
+git cat-file -s 7f35
+The latest file is kept uncompressed to allow faster reads.
+git checkout -b my_feature
+ls -la .git/refs/heads/my_feature
+cat .git/refs/heads/my_feature
+git cat-file -p 9c0f
+echo lots of code > coding.txt
+git commit -am "Wrote lots of code"
+git cat-file -p c9d9
