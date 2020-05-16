@@ -4,6 +4,15 @@ import (
 	"fmt"
 )
 
+//AppDetails stores the application details, for every userId
+type AppDetails map[string]UserDetails
+
+//UserDetails stores the device details of this user, for every deviceId
+type UserDetails map[string]DeviceDetails
+
+//DeviceDetails stores the timeUsed on this device, for every location
+type DeviceDetails map[string]int
+
 func main() {
 	var ad AppDetails = AppDetails{}
 	var ud UserDetails = UserDetails{}
@@ -76,12 +85,3 @@ func GraphSearch(dataSlice map[string]interface{}, level int) map[string]interfa
 	}
 	return result
 }
-
-//AppDetails stores the application details, for every userId
-type AppDetails map[string]UserDetails
-
-//UserDetails stores the device details of this user, for every deviceId
-type UserDetails map[string]DeviceDetails
-
-//DeviceDetails stores the timeUsed on this device, for every location
-type DeviceDetails map[string]int
