@@ -1,2 +1,2 @@
 # projects
-Random projects here
+These are project resources for the live YouTube lectures.
