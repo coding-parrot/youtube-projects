@@ -1,5 +1,8 @@
 package logger;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import exceptions.LoggingException;
 
 import java.io.IOException;
@@ -10,24 +13,17 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SugaredLogger {
-    private static SugaredLogger SUGARED_LOGGER;
+@Singleton
+public class SugaredLogger implements Logger {
     private final String identifier;
     private final OutputStream stream;
     private final List<String> buffer;
 
-    private SugaredLogger(final OutputStream stream) {
+    @Inject
+    public SugaredLogger(final OutputStream stream, @Named("logger.fast.identifier")  String identifier) {
         this.stream = stream;
-        identifier = "service:";
+        this.identifier = identifier;
         buffer = new ArrayList<>();
-    }
-
-
-    public static synchronized SugaredLogger getLogger(OutputStream out) {
-        if (SUGARED_LOGGER == null) {
-            SUGARED_LOGGER = new SugaredLogger(out);
-        }
-        return SUGARED_LOGGER;
     }
 
     public boolean write(final String word) {

@@ -1,7 +1,5 @@
 package logger;
 
-import exceptions.LoggingException;
-
 import java.util.concurrent.CompletableFuture;
 
 public interface Logger {

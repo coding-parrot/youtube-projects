@@ -18,7 +18,7 @@ public class FastLogger implements Logger {
 
     @Inject
     public FastLogger(@Named("logger.fast.identifier") final String identifier,
-                      final OutputStream stream,
+                      @Named("console-output-stream") final OutputStream stream,
                       @Named("logger.fast.buffer.size") final Integer bufferSize) {
         this.identifier = identifier;
         this.stream = stream;

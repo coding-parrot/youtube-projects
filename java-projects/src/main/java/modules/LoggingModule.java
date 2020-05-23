@@ -5,6 +5,7 @@ import com.google.inject.Provides;
 import com.google.inject.name.Named;
 import logger.FastLogger;
 import logger.Logger;
+import logger.SugaredLogger;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -19,7 +20,14 @@ public class LoggingModule extends AbstractModule {
     }
 
     @Provides
+    @Named("file-output-stream")
     public OutputStream getOutputStream(@Named("output-file.name") String fileLocation) throws FileNotFoundException {
         return new FileOutputStream(fileLocation);
+    }
+
+    @Provides
+    @Named("console-output-stream")
+    public OutputStream getConsoleOutputStream(@Named("output-file.name") String fileLocation) throws FileNotFoundException {
+        return System.out;
     }
 }

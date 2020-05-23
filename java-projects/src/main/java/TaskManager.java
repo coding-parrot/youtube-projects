@@ -1,12 +1,17 @@
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import logger.Logger;
 import logger.SugaredLogger;
 
 import java.util.concurrent.CompletableFuture;
 
+@Singleton
 public class TaskManager {
-    private final SugaredLogger logger;
+    private final Logger logger;
 
-    public TaskManager() {
-        this.logger = SugaredLogger.getLogger(System.out);
+    @Inject
+    public TaskManager(final Logger logger) {
+        this.logger = logger;
     }
 
     public CompletableFuture<Void> execute() {
