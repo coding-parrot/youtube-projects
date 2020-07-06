@@ -5,7 +5,6 @@ import com.google.inject.Provides;
 import com.google.inject.name.Named;
 import logger.FastLogger;
 import logger.Logger;
-import logger.SugaredLogger;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

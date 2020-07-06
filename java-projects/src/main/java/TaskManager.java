@@ -1,7 +1,6 @@
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import logger.Logger;
-import logger.SugaredLogger;
 
 import java.util.concurrent.CompletableFuture;
 

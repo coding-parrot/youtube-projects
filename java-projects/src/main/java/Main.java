@@ -1,6 +1,5 @@
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import logger.FastLogger;
 import modules.LoggingModule;
 import modules.PropertiesModule;
 
