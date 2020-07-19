@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-interface LogClient {
+public interface LogClient {
     /**
      * When a process starts, it calls 'start' with processId.
      */
-    void start(String processId);
+    void start(String processId, long timestamp);
 
     /**
      * When the same process ends, it calls 'end' with processId.
@@ -28,7 +28,7 @@ interface LogClient {
      * {2} started at {8} and ended at {12}
      * {1} started at {12} and ended at {15}
      */
-    void poll();
+    String poll();
 }
 
 class LoggerImplementation implements LogClient {
@@ -42,7 +42,7 @@ class LoggerImplementation implements LogClient {
     }
 
     @Override
-    public void start(String processId) {
+    public void start(String processId, long timestamp) {
         final long now = System.currentTimeMillis();
         final Process process = new Process(processId, now);
         processes.put(processId, process);
@@ -56,10 +56,10 @@ class LoggerImplementation implements LogClient {
     }
 
     @Override
-    public void poll() {
-        if (queue.isEmpty()){
+    public String poll() {
+        if (queue.isEmpty()) {
             System.out.println("Queue is empty");
-            return;
+            return null;
         }
         final Process process = queue.firstEntry().getValue();
         if (process.getEndTime() != -1) {
@@ -69,6 +69,7 @@ class LoggerImplementation implements LogClient {
         } else {
             System.out.println("No completed tasks in queue. " + queue.size());
         }
+        return null;
     }
 }
 
@@ -108,13 +109,13 @@ class LoggerMain {
      */
     public static void main(String[] args) {
         final LogClient logger = new LoggerImplementation();
-        logger.start("1");
+        logger.start("1",1);
         logger.poll();
-        logger.start("3");
+        logger.start("3",2);
         logger.poll();
         logger.end("1");
         logger.poll();
-        logger.start("2");
+        logger.start("2",3);
         logger.poll();
         logger.end("2");
         logger.poll();

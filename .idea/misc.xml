@@ -6,6 +6,8 @@
         <option value="$PROJECT_DIR$/src/pom.xml" />
         <option value="$PROJECT_DIR$/dependency-injection/pom.xml" />
         <option value="$PROJECT_DIR$/java-projects/pom.xml" />
+        <option value="$PROJECT_DIR$/microservice-helloworld/service-registry/pom.xml" />
+        <option value="$PROJECT_DIR$/microservice-helloworld/profile-service/pom.xml" />
       </list>
     </option>
   </component>

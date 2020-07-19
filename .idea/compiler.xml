@@ -7,12 +7,15 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="java-projects (1)" />
         <module name="java-projects" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="dependency-injection" target="1.5" />
-      <module name="java-projects" target="9" />
+      <module name="java-projects" target="11" />
+      <module name="java-projects (1)" target="1.5" />
+      <module name="profile-service" target="9" />
       <module name="src" target="1.5" />
     </bytecodeTargetLevel>
   </component>
