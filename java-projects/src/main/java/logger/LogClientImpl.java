@@ -12,23 +12,22 @@ public class LogClientImpl implements LogClient {
     private final Timer timer;
     private final Lock lock;
     private final BlockingQueue<CompletableFuture<String>> pendingPolls;
-    private final ExecutorService executorService[];
+    private final ExecutorService[] executorService;
 
-    public LogClientImpl(Timer timer) {
+    public LogClientImpl(Timer timer, int threads) {
         queue = new ConcurrentSkipListMap<>();
         map = new ConcurrentHashMap<>();
         this.timer = timer;
         lock = new ReentrantLock();
         pendingPolls = new LinkedBlockingQueue<>();
-        executorService = new ExecutorService[10];
-        for (int i = 0; i < 10; i++) {
+        executorService = new ExecutorService[threads];
+        for (int i = 0; i < executorService.length; i++) {
             executorService[i] = Executors.newSingleThreadExecutor();
         }
     }
 
     public void start(final String taskId, long timestamp) {
         executorService[taskId.hashCode() % executorService.length].execute(() -> {
-            System.out.println("START " + taskId);
             final Process task = new Process(taskId, timestamp);
             map.put(taskId, task);
             queue.putIfAbsent(timestamp, new CopyOnWriteArrayList<>());
@@ -38,7 +37,6 @@ public class LogClientImpl implements LogClient {
 
     public void end(final String taskId) {
         executorService[taskId.hashCode() % executorService.length].execute(() -> {
-            System.out.println("END " + taskId);
             map.get(taskId).setEndTime(timer.getCurrentTime());
             lock.lock();
             try {
@@ -85,7 +83,9 @@ public class LogClientImpl implements LogClient {
                         queue.pollFirstEntry();
                     }
                     map.remove(earliest.getId());
-                    return "task " + earliest.getId() + " started at: " + earliest.getStartTime() + " and ended at: " + earliest.getEndTime();
+                    final var logStatement = "task " + earliest.getId() + " started at: " + earliest.getStartTime() + " and ended at: " + earliest.getEndTime();
+                    System.out.println(logStatement);
+                    return logStatement;
                 }
             }
         }

@@ -1,98 +1,74 @@
-import javafx.collections.transformation.SortedList;
 import logger.LogClient;
 import logger.LogClientImpl;
-import org.junit.Assert;
+import logger.Timer;
 import org.junit.Test;
 
-import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
+
+import static java.util.concurrent.CompletableFuture.allOf;
+import static java.util.concurrent.CompletableFuture.runAsync;
 
 public class LoggerTest {
     @Test
     public void defaultLogging() throws InterruptedException, ExecutionException {
-        final TestTimer timer = new TestTimer();
-        final LogClient logClient = new LogClientImpl(timer);
+        final LogClient logClient = new LogClientImpl(new Timer(), 10);
         List<CompletableFuture<Void>> tasks = new ArrayList<>();
-        addTask(() -> logClient.start("1", 1), tasks);
-        passOneSecond(timer);
-        addTask(() -> logClient.start("2", 2), tasks);
-        passOneSecond(timer);
-        addTask(() -> logClient.start("3", 3), tasks);
-        CompletableFuture.allOf(tasks.toArray(CompletableFuture[]::new)).get();
-        tasks.clear();
-        passOneSecond(timer);
-        addTask(() -> logClient.end("3"), tasks);
-        passOneSecond(timer);
-        addTask(() -> logClient.end("2"), tasks);
-        passOneSecond(timer);
-        passOneSecond(timer);
-        addTask(() -> System.out.println(logClient.poll()), tasks);
-        passOneSecond(timer);
-        addTask(() -> System.out.println(logClient.poll()), tasks);
-        passOneSecond(timer);
-        addTask(() -> logClient.end("1"), tasks);
-        addTask(() -> System.out.println(logClient.poll()), tasks);
-        CompletableFuture.allOf(tasks.toArray(CompletableFuture[]::new)).get();
-        tasks.clear();
+        logClient.start("1", 1);
+        logClient.start("2", 2);
+        logClient.start("3", 3);
+        tasks.add(runAsync(() -> logClient.end("3")));
+        tasks.add(runAsync(() -> logClient.end("2")));
+        tasks.add(runAsync(logClient::poll));
+        tasks.add(runAsync(logClient::poll));
+        tasks.add(runAsync(() -> logClient.end("1")));
+        tasks.add(runAsync(logClient::poll));
+        allOf(tasks.toArray(CompletableFuture[]::new)).get();
     }
 
     @Test
     public void concurrencyTest() throws ExecutionException, InterruptedException {
-        final TestTimer timer = new TestTimer();
-        final LogClient logClient = new LogClientImpl(timer);
+        final LogClient logClient = new LogClientImpl(new Timer(), 10);
         final ExecutorService executorService = Executors.newFixedThreadPool(5000);
         final Random random = new Random();
         final List<String> commands = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
+        final var size = 1000;
+        for (int i = 0; i < size; i++) {
             commands.add("POLL");
             commands.add("END " + i);
         }
         Collections.shuffle(commands);
-        int index = 0;
-        while (index < commands.size()) {
-            if (!commands.get(index).equals("POLL")) {
-                commands.add(random.nextInt(index + 1), "START " + commands.get(index).split(" ")[1]);
-                index++;
+        Map<Integer, Integer> ends = new HashMap<>();
+        for (int i = 0; i < size * 2; i++) {
+            if (!commands.get(i).equals("POLL")) {
+                ends.put(Integer.parseInt(commands.get(i).split(" ")[1]), i);
             }
-            index++;
         }
-        List<String> results = new CopyOnWriteArrayList<>();
-        List<CompletableFuture<Void>> tasks = new CopyOnWriteArrayList<>();
+        int index = commands.size() - 1;
+        while (index >= 0) {
+            if (commands.get(index).startsWith("END ")) {
+                final var taskId = Integer.parseInt(commands.get(index).split(" ")[1]);
+                final var insertionPoint = random.nextInt(Math.min(ends.get(taskId), ends.getOrDefault(taskId + 1, commands.size() - 1)) + 1);
+                commands.add(insertionPoint, "START " + taskId);
+                if (insertionPoint <= index) {
+                    index++;
+                }
+            }
+            index--;
+        }
+        final List<CompletableFuture<Void>> tasks = new CopyOnWriteArrayList<>();
         for (final String command : commands) {
             if (command.equals("POLL")) {
-                tasks.add(CompletableFuture.supplyAsync(logClient::poll, executorService).thenAccept(results::add));
+                tasks.add(runAsync(logClient::poll, executorService));
             } else {
                 final var id = command.split(" ")[1];
                 if (command.startsWith("START ")) {
-                    logClient.start(id, (Long.parseLong(id) + 1) * 1000);
+                    logClient.start(id, Long.parseLong(id) + 1);
                 } else {
-                    logClient.end(id);
+                    runAsync(() -> logClient.end(id), executorService);
                 }
             }
         }
-        CompletableFuture.allOf(tasks.toArray(CompletableFuture[]::new)).get();
-        for (int i = 0; i < results.size(); i++) {
-            final var s = results.get(i);
-            System.out.println(s);
-            Assert.assertTrue(s.startsWith("task " + i + " started at:"));
-        }
+        allOf(tasks.toArray(CompletableFuture[]::new)).get();
     }
-
-    private void addTask(Runnable task, List<CompletableFuture<Void>> tasks) {
-        tasks.add(CompletableFuture.runAsync(task));
-    }
-
-    private void passOneSecond(TestTimer timer) {
-        passTime(timer, Duration.ofSeconds(1).toMillis());
-    }
-
-    private void passTime(TestTimer timer, long duration) {
-        timer.setCurrentTime(timer.getCurrentTime() + duration);
-    }
-}
-
-class Statement {
-    String id;
-    int start, end;
 }
