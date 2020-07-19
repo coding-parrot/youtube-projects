@@ -62,7 +62,7 @@ public class LoggerTest {
             } else {
                 final var id = command.split(" ")[1];
                 if (command.startsWith("START ")) {
-                    logClient.start(id, Long.parseLong(id) + 1);
+                    logClient.start(id, size - Long.parseLong(id) + 1);
                 } else {
                     runAsync(() -> logClient.end(id), executorService);
                 }
