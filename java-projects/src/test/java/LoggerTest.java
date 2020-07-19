@@ -1,6 +1,5 @@
 import logger.LogClient;
 import logger.LogClientImpl;
-import logger.Timer;
 import org.junit.Test;
 
 import java.util.*;
@@ -12,7 +11,7 @@ import static java.util.concurrent.CompletableFuture.runAsync;
 public class LoggerTest {
     @Test
     public void defaultLogging() throws InterruptedException, ExecutionException {
-        final LogClient logClient = new LogClientImpl(new Timer(), 10);
+        final LogClient logClient = new LogClientImpl(10);
         List<CompletableFuture<Void>> tasks = new ArrayList<>();
         logClient.start("1", 1);
         logClient.start("2", 2);
@@ -28,7 +27,7 @@ public class LoggerTest {
 
     @Test
     public void concurrencyTest() throws ExecutionException, InterruptedException {
-        final LogClient logClient = new LogClientImpl(new Timer(), 10);
+        final LogClient logClient = new LogClientImpl(10);
         final ExecutorService executorService = Executors.newFixedThreadPool(5000);
         final Random random = new Random();
         final List<String> commands = new ArrayList<>();

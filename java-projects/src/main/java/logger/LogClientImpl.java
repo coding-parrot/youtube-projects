@@ -9,15 +9,13 @@ import java.util.concurrent.locks.ReentrantLock;
 public class LogClientImpl implements LogClient {
     private final ConcurrentSkipListMap<Long, List<Process>> queue;
     private final Map<String, Process> map;
-    private final Timer timer;
     private final Lock lock;
     private final BlockingQueue<CompletableFuture<String>> pendingPolls;
     private final ExecutorService[] executorService;
 
-    public LogClientImpl(Timer timer, int threads) {
+    public LogClientImpl(int threads) {
         queue = new ConcurrentSkipListMap<>();
         map = new ConcurrentHashMap<>();
-        this.timer = timer;
         lock = new ReentrantLock();
         pendingPolls = new LinkedBlockingQueue<>();
         executorService = new ExecutorService[threads];
@@ -37,7 +35,7 @@ public class LogClientImpl implements LogClient {
 
     public void end(final String taskId) {
         executorService[taskId.hashCode() % executorService.length].execute(() -> {
-            map.get(taskId).setEndTime(timer.getCurrentTime());
+            map.get(taskId).setEndTime(System.currentTimeMillis());
             lock.lock();
             try {
                 String result;
