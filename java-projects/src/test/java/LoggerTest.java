@@ -13,9 +13,9 @@ public class LoggerTest {
     public void defaultLogging() throws InterruptedException, ExecutionException {
         final LogClient logClient = new LogClientImpl(10);
         List<CompletableFuture<Void>> tasks = new ArrayList<>();
-        tasks.add(runAsync(() -> logClient.start("1", 1)));
-        tasks.add(runAsync(() -> logClient.start("2", 2)));
-        tasks.add(runAsync(() -> logClient.start("3", 3)));
+        logClient.start("1", 1);
+        logClient.start("2", 2);
+        logClient.start("3", 3);
         tasks.add(runAsync(() -> logClient.end("3")));
         tasks.add(runAsync(() -> logClient.end("2")));
         tasks.add(runAsync(logClient::poll));
@@ -28,10 +28,10 @@ public class LoggerTest {
     @Test
     public void concurrencyTest() throws ExecutionException, InterruptedException {
         final LogClient logClient = new LogClientImpl(10);
-        final ExecutorService executorService = Executors.newFixedThreadPool(5000);
+        final var size = 1000;
+        final ExecutorService executorService = Executors.newFixedThreadPool(size);
         final Random random = new Random();
         final List<String> commands = new ArrayList<>();
-        final var size = 1000;
         for (int i = 0; i < size; i++) {
             commands.add("POLL");
             commands.add("END " + i);
@@ -62,9 +62,9 @@ public class LoggerTest {
             } else {
                 final var id = command.split(" ")[1];
                 if (command.startsWith("START ")) {
-                    runAsync(() -> logClient.start(id, size - Long.parseLong(id) + 1), executorService);
+                    logClient.start(id, size - Long.parseLong(id) + 1);
                 } else {
-                    runAsync(() -> logClient.end(id), executorService);
+                    logClient.end(id);
                 }
             }
         }
