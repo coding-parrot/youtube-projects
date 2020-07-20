@@ -53,10 +53,9 @@ class LoggerImplementation implements LogClient {
     @Override
     public void start(String processId, long timestamp) { //1
         taskScheduler[processId.hashCode() % taskScheduler.length].execute(() -> {
-            final long now = System.currentTimeMillis();    //1
-            final Process process = new Process(processId, now);
+            final Process process = new Process(processId, timestamp);
             processes.put(processId, process);
-            queue.put(now, process);
+            queue.put(timestamp, process);
         });
     }
 

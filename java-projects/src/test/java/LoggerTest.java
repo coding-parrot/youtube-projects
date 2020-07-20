@@ -13,9 +13,9 @@ public class LoggerTest {
     public void defaultLogging() throws InterruptedException, ExecutionException {
         final LogClient logClient = new LogClientImpl(10);
         List<CompletableFuture<Void>> tasks = new ArrayList<>();
-        logClient.start("1", 1);
-        logClient.start("2", 2);
-        logClient.start("3", 3);
+        tasks.add(runAsync(() -> logClient.start("1", 1)));
+        tasks.add(runAsync(() -> logClient.start("2", 2)));
+        tasks.add(runAsync(() -> logClient.start("3", 3)));
         tasks.add(runAsync(() -> logClient.end("3")));
         tasks.add(runAsync(() -> logClient.end("2")));
         tasks.add(runAsync(logClient::poll));
@@ -62,7 +62,7 @@ public class LoggerTest {
             } else {
                 final var id = command.split(" ")[1];
                 if (command.startsWith("START ")) {
-                    logClient.start(id, size - Long.parseLong(id) + 1);
+                    runAsync(() -> logClient.start(id, size - Long.parseLong(id) + 1), executorService);
                 } else {
                     runAsync(() -> logClient.end(id), executorService);
                 }
