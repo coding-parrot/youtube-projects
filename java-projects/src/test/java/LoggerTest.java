@@ -16,11 +16,11 @@ public class LoggerTest {
         logClient.start("1", 1);
         logClient.start("2", 2);
         logClient.start("3", 3);
-        tasks.add(runAsync(() -> logClient.end("3")));
-        tasks.add(runAsync(() -> logClient.end("2")));
+        logClient.end("3");
+        logClient.end("2");
         tasks.add(runAsync(logClient::poll));
         tasks.add(runAsync(logClient::poll));
-        tasks.add(runAsync(() -> logClient.end("1")));
+        logClient.end("1");
         tasks.add(runAsync(logClient::poll));
         allOf(tasks.toArray(CompletableFuture[]::new)).get();
     }
