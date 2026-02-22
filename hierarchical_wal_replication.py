@@ -26,9 +26,18 @@ class HierarchicalWALReplication(Scene):
                 color=WHITE,
             )
 
-        def wal_label_for(arrow, dy=0.24):
+        def wal_label_for(arrow, offset=0.18):
             label = Text("WAL", font_size=22, color=WHITE)
-            label.move_to(arrow.get_center() + UP * dy)
+            start = arrow.get_start()
+            end = arrow.get_end()
+            vec = end - start
+            length = np.linalg.norm(vec)
+            if length == 0:
+                normal = UP
+            else:
+                unit = vec / length
+                normal = np.array([-unit[1], unit[0], 0.0])
+            label.move_to(arrow.get_center() + normal * offset)
             return label
 
         title = Text("PostgreSQL Cascading Replication", font_size=42, color=WHITE).to_edge(UP)
@@ -67,8 +76,8 @@ class HierarchicalWALReplication(Scene):
         top_arrows = VGroup(a_p_l, a_p_r)
         bottom_arrows = VGroup(a_l_1, a_l_2, a_r_1, a_r_2)
 
-        top_labels = VGroup(*[wal_label_for(a, dy=0.22) for a in top_arrows])
-        bottom_labels = VGroup(*[wal_label_for(a, dy=0.2) for a in bottom_arrows])
+        top_labels = VGroup(*[wal_label_for(a, offset=0.16) for a in top_arrows])
+        bottom_labels = VGroup(*[wal_label_for(a, offset=0.15) for a in bottom_arrows])
 
         self.play(FadeIn(title), run_time=0.8)
         self.play(FadeIn(primary), run_time=0.6)
