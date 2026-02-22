@@ -26,20 +26,6 @@ class HierarchicalWALReplication(Scene):
                 color=WHITE,
             )
 
-        def wal_label_for(arrow, offset=0.18):
-            label = Text("WAL", font_size=22, color=WHITE)
-            start = arrow.get_start()
-            end = arrow.get_end()
-            vec = end - start
-            length = np.linalg.norm(vec)
-            if length == 0:
-                normal = UP
-            else:
-                unit = vec / length
-                normal = np.array([-unit[1], unit[0], 0.0])
-            label.move_to(arrow.get_center() + normal * offset)
-            return label
-
         title = Text("PostgreSQL Cascading Replication", font_size=42, color=WHITE).to_edge(UP)
 
         primary = make_node("PRIMARY", w=3.2, h=1.1, fill="#0398fc", text_color=WHITE, fs=30)
@@ -76,18 +62,13 @@ class HierarchicalWALReplication(Scene):
         top_arrows = VGroup(a_p_l, a_p_r)
         bottom_arrows = VGroup(a_l_1, a_l_2, a_r_1, a_r_2)
 
-        top_labels = VGroup(*[wal_label_for(a, offset=0.16) for a in top_arrows])
-        bottom_labels = VGroup(*[wal_label_for(a, offset=0.15) for a in bottom_arrows])
-
         self.play(FadeIn(title), run_time=0.8)
         self.play(FadeIn(primary), run_time=0.6)
         self.play(FadeIn(level2), FadeIn(ellipsis_top), run_time=0.8)
         self.play(FadeIn(reads), FadeIn(ellipsis_bottom_left), FadeIn(ellipsis_bottom_right), run_time=0.9)
 
         self.play(LaggedStart(*[Create(a) for a in top_arrows], lag_ratio=0.15), run_time=0.8)
-        self.play(FadeIn(top_labels), run_time=0.3)
         self.play(LaggedStart(*[Create(a) for a in bottom_arrows], lag_ratio=0.1), run_time=0.9)
-        self.play(FadeIn(bottom_labels), run_time=0.3)
 
         wal_events_top = VGroup(*[Dot(radius=0.09, color=YELLOW) for _ in top_arrows])
         for dot, arrow in zip(wal_events_top, top_arrows):
